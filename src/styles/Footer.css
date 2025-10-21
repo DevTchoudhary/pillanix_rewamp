@@ -1,0 +1,349 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #000000 !important;
+  overflow-x: hidden;
+}
+
+.cta-button {
+  background: var(--primary-gradient);
+  transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+  background: var(--primary-gradient-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.glass-effect {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.footer-wrapper {
+  width: 100vw;
+  min-height: 100vh;
+  position: relative;
+  margin: 0 !important;
+  padding: 0 !important;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw !important;
+  margin-right: -50vw !important;
+  background: #000000 !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.footer-main {
+  width: 100%;
+  min-height: 100%;
+  background: #000000 !important;
+  position: relative;
+  overflow: hidden;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 6rem !important;
+  right: 1.5rem !important;
+  z-index: 1050 !important;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s.ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5rem;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+}
+
+.scroll-to-top:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+}
+
+.scroll-to-top:active {
+  transform: translateY(0);
+}
+
+.whatsapp-float-button {
+  position: fixed !important;
+  bottom: 1rem !important;
+  right: 1.5rem !important;
+  z-index: 1000 !important;
+  width: 3.5rem !important;
+  height: 3.5rem !important;
+}
+
+.footer-section {
+  text-align: left;
+}
+
+.footer-section h3 {
+  text-align: left;
+}
+
+.footer-section--center,
+.footer-section--center h3 {
+  text-align: center;
+}
+
+.footer-section--stacked ul {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  width: 100%;
+}
+
+.footer-section--stacked li,
+.footer-section--stacked a,
+.footer-section--stacked span {
+  text-align: left;
+  width: 100%;
+}
+
+.footer-services-list {
+  width: 100%;
+}
+
+.footer-service-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 0.25rem 0;
+  background: transparent !important;
+  border-radius: 0;
+  box-shadow: none !important;
+  transition: transform 0.25s ease;
+}
+
+.footer-service-link:hover {
+  background: transparent !important;
+  transform: translateX(4px);
+}
+
+.newsletter-section,
+.footer-bottom {
+  text-align: center;
+}
+
+.social-icons,
+.footer-links {
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .footer-wrapper {
+    min-height: auto;
+  }
+  
+  .footer-main {
+    min-height: auto;
+    padding-bottom: 2rem;
+  }
+  
+  .footer-section,
+  .footer-section h3 {
+    text-align: center !important;
+  }
+  
+  .footer-section--stacked ul {
+    align-items: center !important;
+  }
+  
+  .footer-section--stacked li,
+  .footer-section--stacked a,
+  .footer-section--stacked span {
+    text-align: center !important;
+  }
+  
+  .footer-service-link {
+    justify-content: center;
+  }
+  
+  .glass-effect {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 3rem !important;
+  }
+  
+  .footer-main-content {
+    padding: 4rem 1.5rem 6rem 1.5rem !important;
+  }
+  
+  .newsletter-form {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .newsletter-input {
+    width: 100% !important;
+  }
+  
+  .footer-bottom {
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+    text-align: center !important;
+    padding-top: 2rem !important;
+    padding-bottom: 4rem !important;
+  }
+  
+  .footer-links {
+    flex-direction: column !important;
+    gap: 1rem !important;
+    justify-content: center !important;
+  }
+  
+  .scroll-to-top,
+  .whatsapp-float-button {
+    right: 1rem !important;
+  }
+  
+  .scroll-to-top {
+    bottom: 5rem !important;
+    width: 3rem !important;
+    height: 3rem !important;
+  }
+  
+  .whatsapp-float-button {
+    bottom: 1rem !important;
+    width: 3rem !important;
+    height: 3rem !important;
+  }
+  
+  .social-icons {
+    justify-content: center !important;
+    gap: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-main-content {
+    padding: 3rem 1rem 5rem 1rem !important;
+  }
+  
+  .footer-section h3 {
+    font-size: 1.25rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .newsletter-section {
+    padding: 2rem 0 !important;
+  }
+  
+  .newsletter-title {
+    font-size: 1.75rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .footer-grid {
+    gap: 2.5rem !important;
+  }
+  
+  .scroll-to-top,
+  .whatsapp-float-button {
+    right: 0.75rem !important;
+  }
+  
+  .scroll-to-top {
+    bottom: 4.5rem !important;
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+  }
+  
+  .whatsapp-float-button {
+    bottom: 0.75rem !important;
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+  }
+}
+
+@media (max-width: 320px) {
+  .footer-main-content {
+    padding: 2rem 0.75rem 4rem 0.75rem !important;
+  }
+  
+  .footer-grid {
+    gap: 2rem !important;
+  }
+  
+  .scroll-to-top,
+  .whatsapp-float-button {
+    right: 0.5rem !important;
+  }
+  
+  .scroll-to-top {
+    bottom: 4rem !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+  
+  .whatsapp-float-button {
+    bottom: 0.5rem !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .footer-wrapper,
+  .footer-main {
+    min-height: auto !important;
+  }
+  
+  .footer-main-content {
+    padding: 2rem 1rem 3rem 1rem !important;
+  }
+  
+  .footer-grid {
+    gap: 1.5rem !important;
+  }
+  
+  .scroll-to-top {
+    bottom: 3rem !important;
+  }
+}
+
+.footer-wrapper::before,
+.footer-wrapper::after {
+  content: '';
+  position: absolute;
+  background: #000000;
+  z-index: -1;
+}
+
+.footer-wrapper::before {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: -10px;
+}
+
+.footer-wrapper::after {
+  bottom: -20px;
+  left: -10px;
+  right: -10px;
+  height: 30px;
+}

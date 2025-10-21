@@ -1,0 +1,138 @@
+.cta-button {
+  background: var(--primary-gradient);
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.cta-button:hover {
+  background: var(--primary-gradient-hover);
+  transform: translateZ(0) scale(1.05);
+}
+
+.performance-optimized {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.hardware-accelerated {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.video-container {
+  will-change: opacity;
+  transform: translateZ(0);
+}
+
+.glass-effect {
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+}
+
+/* Smooth transitions for all elements */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optimize scroll performance */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: prefer-reduced-motion) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Responsive breakpoints */
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2.5rem !important;
+    line-height: 1.1 !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 1rem !important;
+    margin-bottom: 2rem !important;
+    padding: 0 1rem !important;
+  }
+  
+  .section-title {
+    font-size: 2rem !important;
+  }
+  
+  .service-card {
+    width: 280px !important;
+    height: 400px !important;
+    padding: 1.5rem !important;
+  }
+  
+  .cta-section-content {
+    padding: 2rem !important;
+  }
+  
+  .cta-section-title {
+    font-size: 2rem !important;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .hero-title {
+    font-size: 3rem !important;
+    line-height: 1.1 !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem !important;
+  }
+  
+  .section-title {
+    font-size: 2.5rem !important;
+  }
+  
+  .service-card {
+    width: 320px !important;
+    height: 460px !important;
+  }
+  
+  .cta-section-title {
+    font-size: 2.5rem !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hero-title {
+    font-size: 4rem !important;
+  }
+  
+  .section-title {
+    font-size: 3rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .glass-effect {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+}
+
+/* Prevent layout shift during scroll lock */
+body.scroll-locked {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  #services-section .sticky {
+    justify-content: flex-start;
+    padding-top: 16rem;
+  }
+}

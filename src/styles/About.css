@@ -1,0 +1,125 @@
+html {
+  background-color: #000000;
+}
+
+body {
+  background-color: #000000 !important;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  background-color: #000000 !important;
+  min-height: 100vh;
+  position: relative;  /* YE ADD KARO */
+}
+
+/* CRITICAL FIX - Navbar ko top pe rakho */
+.navbar {
+  z-index: 9999 !important;  /* YE ZAROORI HAI */
+}
+
+.cta-button {
+  background: var(--primary-gradient);
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.cta-button:hover {
+  background: var(--primary-gradient-hover);
+  transform: translateZ(0) scale(1.05);
+}
+
+.performance-optimized {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.hardware-accelerated {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.glass-effect {
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  isolation: isolate;  /* YE ADD KARO - prevents stacking context issues */
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2.5rem !important;
+    line-height: 1.1 !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 1rem !important;
+    margin-bottom: 2rem !important;
+    padding: 0 1rem !important;
+  }
+  
+  .section-title {
+    font-size: 2rem !important;
+  }
+  
+  .service-card,
+  .value-card {
+    padding: 1.5rem !important;
+  }
+  
+  .vision-card {
+    padding: 1.5rem !important;
+  }
+  
+  .cta-section-content {
+    padding: 2rem !important;
+  }
+  
+  .cta-section-title {
+    font-size: 2rem !important;
+  }
+  
+  .image-container {
+    height: 12rem !important;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .hero-title {
+    font-size: 3rem !important;
+    line-height: 1.1 !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem !important;
+  }
+  
+  .section-title {
+    font-size: 2.5rem !important;
+  }
+  
+  .cta-section-title {
+    font-size: 2.5rem !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hero-title {
+    font-size: 4rem !important;
+  }
+  
+  .section-title {
+    font-size: 3rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .glass-effect {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+}

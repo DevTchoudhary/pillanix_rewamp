@@ -1,0 +1,16 @@
+.performance-optimized {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.hardware-accelerated {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.video-container {
+  will-change: opacity;
+  transform: translateZ(0);
+}
