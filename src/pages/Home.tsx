@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/Home.css';
 
+
 const Home = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const ctaVideoRef = useRef<HTMLVideoElement>(null);
-  const storyVideoRef = useRef<HTMLVideoElement>(null);
   const { t } = useTranslation();
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isCtaVideoLoaded, setIsCtaVideoLoaded] = useState(false);
@@ -16,6 +16,7 @@ const Home = () => {
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [isStoryVideoReady, setIsStoryVideoReady] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+
 
   // 🔥 PREVENT INITIAL OVERFLOW - Component Mount Fix
   useEffect(() => {
@@ -30,10 +31,12 @@ const Home = () => {
       setIsComponentMounted(true);
     }, 50);
 
+
     return () => {
       clearTimeout(timer);
     };
   }, []);
+
 
   useEffect(() => {
     if (isStoryOpen) {
@@ -42,10 +45,12 @@ const Home = () => {
       document.body.style.overflow = '';
     }
 
+
     return () => {
       document.body.style.overflow = '';
     };
   }, [isStoryOpen]);
+
 
   // Video handlers using element props instead of addEventListener
   const handleHeroVideoReady = useCallback(() => {
@@ -53,48 +58,45 @@ const Home = () => {
     videoRef.current?.play().catch(console.error);
   }, []);
 
+
   const handleCtaVideoReady = useCallback(() => {
     setIsCtaVideoLoaded(true);
     ctaVideoRef.current?.play().catch(console.error);
   }, []);
+
 
   const handleHeroVideoError = useCallback((e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
     console.error('Hero video error:', e);
     setIsVideoLoaded(true); // Show content even if video fails
   }, []);
 
+
   const handleCtaVideoError = useCallback((e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
     console.error('CTA video error:', e);
     setIsCtaVideoLoaded(true); // Show content even if video fails
   }, []);
+
 
   const handleStoryOpen = useCallback(() => {
     setIsStoryVideoReady(false);
     setIsStoryOpen(true);
   }, []);
 
+
   const handleStoryClose = useCallback(() => {
     setIsStoryOpen(false);
     setIsStoryVideoReady(false);
-    const storyVideo = storyVideoRef.current;
-    if (storyVideo) {
-      storyVideo.pause();
-      storyVideo.currentTime = 0;
-    }
   }, []);
 
-  const handleStoryVideoReady = useCallback(() => {
+
+  const handleIframeLoad = useCallback(() => {
     setIsStoryVideoReady(true);
-    storyVideoRef.current?.play().catch(console.error);
   }, []);
 
-  const handleStoryVideoError = useCallback((e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-    console.error('Story video error:', e);
-    setIsStoryVideoReady(true);
-  }, []);
 
   useEffect(() => {
     if (!isStoryOpen) return;
+
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -102,9 +104,11 @@ const Home = () => {
       }
     };
 
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleStoryClose, isStoryOpen]);
+
 
   const expertiseAreas = useMemo(() => [
     {
@@ -133,6 +137,7 @@ const Home = () => {
     }
   ], []);
 
+
   const CounterStat = React.memo(({ end, suffix = '', duration = 2, delay = 0 }: { 
     end: number; 
     suffix?: string; 
@@ -143,6 +148,7 @@ const Home = () => {
     const ref = useRef<HTMLSpanElement>(null);
     const isInView = useInView(ref, { once: true, margin: "-10%" });
     const rafRef = useRef<number>();
+
 
     useEffect(() => {
       if (isInView && !prefersReducedMotion) {
@@ -179,12 +185,14 @@ const Home = () => {
       }
     }, [isInView, end, duration, delay, prefersReducedMotion]);
 
+
     return (
       <span ref={ref}>
         {count}{suffix}
       </span>
     );
   });
+
 
   const stats = useMemo(() => [
     { number: 50, suffix: '+', label: t('projectsDelivered'), delay: 0.1 },
@@ -193,9 +201,11 @@ const Home = () => {
     { number: 40, suffix: '+', label: t('Support Hours Weekly'), delay: 0.4 }
   ], [t]);
 
+
   const handleScrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
 
   // 🔥 RENDER NOTHING UNTIL MOUNTED TO PREVENT OVERFLOW FLASH
   if (!isComponentMounted) {
@@ -206,8 +216,10 @@ const Home = () => {
     );
   }
 
+
   return (
     <div className="relative bg-black min-h-screen" style={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
+
 
       {/* 🔥 Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center bg-black overflow-protection section-wrapper">
@@ -234,6 +246,7 @@ const Home = () => {
           </video>
           <div className="absolute inset-0 bg-black/40"></div>
         </div>
+
 
         {/* Hero Content */}
         <div className="relative z-10 text-center text-white content-container max-w-6xl">
@@ -307,6 +320,7 @@ const Home = () => {
           </motion.div>
         </div>
 
+
         {/* Scroll Indicator */}
         <motion.div
           className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 performance-optimized"
@@ -318,6 +332,7 @@ const Home = () => {
           </div>
         </motion.div>
       </section>
+
 
       {/* Stats Section */}
       <section className="py-16 sm:py-24 md:py-32 bg-black overflow-protection section-wrapper">
@@ -359,6 +374,7 @@ const Home = () => {
         </div>
       </section>
 
+
       {/* Expertise Section */}
       <section className="py-16 sm:py-24 md:py-32 bg-black overflow-protection section-wrapper">
         <div className="content-container max-w-7xl">
@@ -384,6 +400,7 @@ const Home = () => {
               {t('expertiseSubtitle')}
             </p>
           </motion.div>
+
 
           <div className="space-y-16 sm:space-y-24 md:space-y-32">
             {expertiseAreas.map((expertise, index) => (
@@ -453,6 +470,7 @@ const Home = () => {
             ))}
           </div>
 
+
           <motion.div 
             className="text-center mt-16 sm:mt-24"
             initial={!prefersReducedMotion ? { opacity: 0, y: 30 } : { opacity: 1, y: 0 }}
@@ -472,6 +490,7 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
+
 
       {/* CTA Section */}
       <section className="py-16 sm:py-24 md:py-32 bg-black relative overflow-protection section-wrapper">
@@ -538,6 +557,8 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Story Video Modal with IFRAME */}
       <AnimatePresence>
         {isStoryOpen && (
           <motion.div
@@ -564,24 +585,20 @@ const Home = () => {
               <button
                 type="button"
                 onClick={handleStoryClose}
-                className="absolute top-3 right-3 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors duration-200"
+                className="absolute top-3 right-3 z-20 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors duration-200"
                 aria-label="Close story video"
               >
                 <X className="w-4 h-4" />
               </button>
               <div className="relative w-full pt-[56.25%] bg-black">
-                <video
-                  ref={storyVideoRef}
-                  controls
-                  playsInline
-                  preload="auto"
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${isStoryVideoReady ? 'opacity-100' : 'opacity-0'}`}
-                  onLoadedData={handleStoryVideoReady}
-                  onCanPlay={handleStoryVideoReady}
-                  onError={handleStoryVideoError}
-                >
-                  <source src="/pillavideo.mp4" type="video/mp4" />
-                </video>
+                <iframe
+                  src="https://drive.google.com/file/d/1hoEsBH6J1afQx-PaXxbv9Jl5cJw4nqjV/preview"
+                  className={`absolute inset-0 w-full h-full transition-opacity duration-500 ${isStoryVideoReady ? 'opacity-100' : 'opacity-0'}`}
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                  onLoad={handleIframeLoad}
+                  title="Our Story"
+                />
                 {!isStoryVideoReady && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-white/80">
                     <motion.div
@@ -600,5 +617,6 @@ const Home = () => {
     </div>
   );
 };
+
 
 export default Home;
