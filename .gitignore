@@ -24,3 +24,9 @@ dist-ssr
 *.sw?
 .env
 public/pillavideo.mp4
+# Large video files
+*.mp4
+*.mov
+*.avi
+*.mkv
+public/pillavideo.mp4
