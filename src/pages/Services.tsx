@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, useMotionValue, useTransform, useSpring, AnimatePresence, Variants, useReducedMotion } from 'framer-motion';
-import { ArrowRight, Code, Shield, Cloud, ShoppingCart, Zap, TrendingUp, Users, Award } from 'lucide-react';
+import { ArrowRight, Code, Shield, Cloud, ShoppingCart, Zap, TrendingUp, Users, Award, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/Services.css';
@@ -13,15 +13,13 @@ const Services = () => {
   const [isHovering, setIsHovering] = useState(false);
   const [isHeroVideoLoaded, setIsHeroVideoLoaded] = useState(false);
   const [isCtaVideoLoaded, setIsCtaVideoLoaded] = useState(false);
-  const [isInCardsSection, setIsInCardsSection] = useState(false);
-  const [scrollLockActive, setScrollLockActive] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const ctaVideoRef = useRef<HTMLVideoElement>(null);
-  const servicesSectionRef = useRef<HTMLDivElement>(null);
-  const lastScrollTime = useRef<number>(0);
-  const isTransitioning = useRef(false);
+  const carouselContainerRef = useRef<HTMLDivElement>(null);
+  const lastScrollRef = useRef<number>(0);
+  const touchStartX = useRef<number>(0);
   const prefersReducedMotion = useReducedMotion();
 
   const mouseX = useMotionValue(0);
@@ -68,7 +66,7 @@ const Services = () => {
       image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800',
       icon: Code,
       number: '01',
-      color: 'from-blue-500 to-purple-600',
+      color: '#667EEA',
       particles: 12
     },
     {
@@ -78,7 +76,7 @@ const Services = () => {
       image: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=800',
       icon: Shield,
       number: '02',
-      color: 'from-green-500 to-teal-600',
+      color: '#667EEA',
       particles: 15
     },
     {
@@ -88,7 +86,7 @@ const Services = () => {
       image: 'https://images.pexels.com/photos/3184639/pexels-photo-3184639.jpeg?auto=compress&cs=tinysrgb&w=800',
       icon: Cloud,
       number: '03',
-      color: 'from-orange-500 to-red-600',
+      color: '#667EEA',
       particles: 18
     },
     {
@@ -98,152 +96,81 @@ const Services = () => {
       image: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=800',
       icon: ShoppingCart,
       number: '04',
-      color: 'from-pink-500 to-violet-600',
+      color: '#667EEA',
       particles: 10
     },
     {
       title: 'SaaS Development',
       description: 'MERN and DevOps solutions for SaaS businesses, with a focus on scalability, security, and performance.',
-      features: ['SaaS Platform Development', 'Multi-tenant Architecture', 'Subscription Management', 'Analytics Integration'],
+      features: ['SaaS Platform Development', 'Multi-tenant Architecture', 'Subscription Management', 'Advanced Analytics'],
       image: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=800',
       icon: Code,
       number: '05',
-      color: 'from-indigo-500 to-purple-600',
+      color: '#667EEA',
       particles: 10
     }
   ], []);
 
+  // Navigation handlers
+  const handlePrevCard = useCallback(() => {
+    setCurrentCard((prev) => (prev === 0 ? services.length - 1 : prev - 1));
+  }, [services.length]);
+
+  const handleNextCard = useCallback(() => {
+    setCurrentCard((prev) => (prev === services.length - 1 ? 0 : prev + 1));
+  }, [services.length]);
+
+  // Keyboard navigation
   useEffect(() => {
-    let scrollFrame: number;
-    const handleScroll = () => {
-      if (scrollFrame) {
-        cancelAnimationFrame(scrollFrame);
-      }
-
-      scrollFrame = requestAnimationFrame(() => {
-        const servicesSection = servicesSectionRef.current;
-        if (!servicesSection) return;
-        
-        const rect = servicesSection.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        
-        const isWithinSection = rect.top <= 0 && rect.bottom >= viewportHeight * 0.2;
-        setIsInCardsSection(isWithinSection);
-
-        if (isWithinSection && currentCard < services.length - 1 && !scrollLockActive) {
-          setScrollLockActive(true);
-        }
-        
-        const sectionHeight = rect.height;
-        const heightDifference = Math.max(sectionHeight - viewportHeight, viewportHeight * 0.25);
-
-        if (rect.top <= 0 && rect.bottom >= 0) {
-          const scrolled = Math.min(Math.abs(rect.top), heightDifference);
-          const progress = scrolled / heightDifference;
-          const clampedProgress = Math.min(Math.max(progress, 0), 1);
-          setScrollProgress(clampedProgress);
-        }
-      });
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') handlePrevCard();
+      if (e.key === 'ArrowRight') handleNextCard();
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (scrollFrame) {
-        cancelAnimationFrame(scrollFrame);
-      }
-    };
-  }, [currentCard, services.length, scrollLockActive]);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handlePrevCard, handleNextCard]);
 
+  // Scroll detection for smooth transitions
   useEffect(() => {
+    const container = carouselContainerRef.current;
+    if (!container) return;
+
     const handleWheel = (e: WheelEvent) => {
-      if (!isInCardsSection) {
-        return;
-      }
-
-      const wantsToReengage = !scrollLockActive && e.deltaY < 0 && currentCard > 0;
-
-      if (!scrollLockActive && !wantsToReengage) {
-        return;
-      }
-
-      if (isTransitioning.current) {
-        e.preventDefault();
-        return;
-      }
-
       const now = Date.now();
-      const timeSinceLastScroll = now - lastScrollTime.current;
-
-      if (timeSinceLastScroll < 600) {
-        e.preventDefault();
-        return;
-      }
-
-      const delta = e.deltaY;
-      const scrollingDown = delta > 0;
-      const scrollingUp = delta < 0;
-
-      if (wantsToReengage) {
-        e.preventDefault();
-        isTransitioning.current = true;
-        lastScrollTime.current = now;
-
-        setScrollLockActive(true);
-        setCurrentCard(prev => prev - 1);
-
-        setTimeout(() => {
-          isTransitioning.current = false;
-        }, 600);
-
-        return;
-      }
-
-      if (scrollingDown && currentCard < services.length - 1) {
-        e.preventDefault();
-        isTransitioning.current = true;
-        lastScrollTime.current = now;
-        
-        setCurrentCard(prev => prev + 1);
-        
-        setTimeout(() => {
-          isTransitioning.current = false;
-        }, 600);
-      } 
-      else if (scrollingUp && currentCard > 0) {
-        e.preventDefault();
-        isTransitioning.current = true;
-        lastScrollTime.current = now;
-        
-        setCurrentCard(prev => prev - 1);
-        
-        setTimeout(() => {
-          isTransitioning.current = false;
-        }, 600);
-      }
-      else if (scrollingDown && currentCard === services.length - 1) {
-        setScrollLockActive(false);
+      
+      if (now - lastScrollRef.current < 300) return;
+      
+      if (e.deltaY > 0) {
+        handleNextCard();
+        lastScrollRef.current = now;
+      } else if (e.deltaY < 0) {
+        handlePrevCard();
+        lastScrollRef.current = now;
       }
     };
 
-    window.addEventListener('wheel', handleWheel, { passive: false });
+    container.addEventListener('wheel', handleWheel, { passive: true });
+    return () => container.removeEventListener('wheel', handleWheel);
+  }, [handlePrevCard, handleNextCard]);
 
-    return () => {
-      window.removeEventListener('wheel', handleWheel);
-    };
-  }, [isInCardsSection, currentCard, services.length, scrollLockActive]);
+  // Touch swipe support
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
 
-  useEffect(() => {
-    if (!isInCardsSection && currentCard > 0) {
-      const timer = setTimeout(() => {
-        setCurrentCard(0);
-        setScrollLockActive(false);
-      }, 500);
-      return () => clearTimeout(timer);
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        handleNextCard();
+      } else {
+        handlePrevCard();
+      }
     }
-  }, [isInCardsSection, currentCard]);
+  };
 
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -429,33 +356,7 @@ const Services = () => {
         </div>
       )}
 
-      <AnimatePresence>
-        {isHovering && !prefersReducedMotion && (
-          <motion.div
-            className="fixed pointer-events-none z-50 performance-optimized"
-            style={{
-              left: mousePosition.x - 20,
-              top: mousePosition.y - 20,
-            }}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
-          >
-            <motion.div
-              className="w-10 h-10 rounded-full border-2 border-white/30"
-              animate={{
-                rotate: 360,
-                scale: [1, 1.2, 1]
-              }}
-              transition={{
-                rotate: { duration: 2, repeat: Infinity, ease: "linear" },
-                scale: { duration: 1, repeat: Infinity, ease: "easeInOut" }
-              }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+      {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden bg-black">
         <div className="absolute inset-0 z-0 w-full h-full video-container">
           <video
@@ -491,8 +392,8 @@ const Services = () => {
               animate={{
                 background: [
                   'radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 50%)',
-                  'radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%)',
-                  'radial-gradient(circle at 40% 80%, rgba(139, 90, 150, 0.15) 0%, transparent 50%)'
+                  'radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.15) 0%, transparent 50%)',
+                  'radial-gradient(circle at 40% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%)'
                 ]
               }}
               transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
@@ -523,7 +424,7 @@ const Services = () => {
                   backgroundClip: 'text'
                 }}
               >
-                {t('services')}
+                Services
               </motion.h1>
             </motion.div>
             
@@ -605,79 +506,80 @@ const Services = () => {
         </motion.div>
       </section>
 
+      {/* Services Carousel Section */}
       <section 
-        ref={servicesSectionRef}
-        id="services-section" 
-        className="relative bg-black"
-        style={{ minHeight: '100vh' }}
+        className="relative bg-black py-20 md:py-32 overflow-hidden"
       >
-        <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full">
-            <motion.div 
-              initial={!prefersReducedMotion ? { opacity: 0, y: 50, rotateX: 45 } : { opacity: 1, y: 0, rotateX: 0 }}
-              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-              transition={{ duration: prefersReducedMotion ? 0.3 : 1, ease: [0.25, 0.46, 0.45, 0.94] }}
-              viewport={{ once: true }}
-              className="text-center mb-12 sm:mb-16 relative z-20"
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-12 md:mb-20 relative z-20"
+          >
+            <motion.h2
+              className="section-title font-display text-3xl sm:text-5xl md:text-6xl font-bold mb-4 sm:mb-6 relative"
+              style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 25%, #e0e0e0 50%, #f8f8f8 75%, #ffffff 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}
+              animate={!prefersReducedMotion ? { y: [-10, 10, -10] } : {}}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
             >
-              <motion.h2
-                className="section-title font-display text-3xl sm:text-5xl md:text-6xl font-bold mb-4 sm:mb-6 relative"
-                style={{
-                  background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 25%, #e0e0e0 50%, #f8f8f8 75%, #ffffff 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}
-                animate={!prefersReducedMotion ? { y: [-10, 10, -10] } : {}}
-                transition={{
-                  duration: 6,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                Our Premium Services
-                {!prefersReducedMotion && (
-                  <motion.div
-                    className="absolute inset-0 -z-10"
-                    animate={{
-                      background: [
-                        'radial-gradient(ellipse 100% 50% at 50% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 70%)',
-                        'radial-gradient(ellipse 120% 60% at 50% 50%, rgba(118, 75, 162, 0.1) 0%, transparent 70%)',
-                        'radial-gradient(ellipse 100% 50% at 50% 50%, rgba(139, 90, 150, 0.1) 0%, transparent 70%)'
-                      ]
-                    }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                )}
-              </motion.h2>
-              
-              <motion.p 
-                className="text-base sm:text-lg text-white/80 max-w-4xl mx-auto leading-relaxed px-4"
-                animate={!prefersReducedMotion ? { opacity: [0.8, 1, 0.8] } : {}}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              >
-              </motion.p>
-            </motion.div>
+              Our Premium Services
+              {!prefersReducedMotion && (
+                <motion.div
+                  className="absolute inset-0 -z-10"
+                  animate={{
+                    background: [
+                      'radial-gradient(ellipse 100% 50% at 50% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 70%)',
+                      'radial-gradient(ellipse 120% 60% at 50% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 70%)',
+                      'radial-gradient(ellipse 100% 50% at 50% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 70%)'
+                    ]
+                  }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                />
+              )}
+            </motion.h2>
+            
+            <motion.p 
+              className="text-base sm:text-lg text-white/70 max-w-4xl mx-auto leading-relaxed px-4 mt-4"
+              animate={!prefersReducedMotion ? { opacity: [0.7, 1, 0.7] } : {}}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              Explore our comprehensive suite of services designed to transform your business
+            </motion.p>
+          </motion.div>
 
-            <div className="relative h-[400px] sm:h-[500px] md:h-[600px] flex items-center justify-center perspective-1000 overflow-hidden">
+          {/* Carousel Container */}
+          <div 
+            ref={carouselContainerRef}
+            className="relative mb-16 md:mb-20"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {/* Cards Container - 3D Perspective Carousel */}
+            <div className="relative h-[400px] sm:h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden perspective-1000">
               {services.map((service, index) => (
                 <motion.div
                   key={index}
-                  className="service-card absolute w-72 h-96 sm:w-80 sm:h-[440px] md:w-96 md:h-[520px] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 glass-effect overflow-hidden performance-optimized"
+                  className="service-card absolute w-72 h-96 sm:w-80 sm:h-[440px] md:w-96 md:h-[520px] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 glass-effect overflow-hidden performance-optimized cursor-pointer"
                   style={{
                     ...getCardTransform(index),
                     background: 'rgba(255, 255, 255, 0.02)',
                     border: '1px solid rgba(255, 255, 255, 0.08)',
                     boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                    maxWidth: 'calc(100vw - 2rem)',
-                    left: '50%',
-                    transform: `translateX(-50%) ${getCardTransform(index).transform}`
+                    maxWidth: 'calc(100vw - 2rem)'
                   }}
-                  animate={{
-                    ...getCardTransform(index),
-                    left: '50%',
-                    transform: `translateX(-50%) ${getCardTransform(index).transform}`
-                  }}
+                  animate={getCardTransform(index)}
                   transition={{ 
                     duration: 0.6, 
                     ease: [0.34, 1.56, 0.64, 1],
@@ -686,21 +588,20 @@ const Services = () => {
                     stiffness: 100
                   }}
                   whileHover={{
-                    scale: index === currentCard ? (prefersReducedMotion ? 1 : (window.innerWidth < 768 ? 0.95 : 1.05)) : (prefersReducedMotion ? 1 : (window.innerWidth < 768 ? 0.8 : 0.85)),
-                    y: index === currentCard ? (prefersReducedMotion ? 0 : (window.innerWidth < 768 ? -10 : -20)) : (prefersReducedMotion ? 0 : (window.innerWidth < 768 ? 10 : 20)),
-                    transition: { duration: 0.3 }
+                    scale: index === currentCard ? (prefersReducedMotion ? 1 : 1.05) : (prefersReducedMotion ? 1 : 0.85),
                   }}
+                  onClick={() => setCurrentCard(index)}
                 >
                   {!prefersReducedMotion && window.innerWidth > 768 && (
                     <div className="absolute inset-0 pointer-events-none">
-                      {[...Array(Math.min(service.particles, window.innerWidth < 768 ? 4 : 8))].map((_, i) => (
+                      {[...Array(Math.min(service.particles, 8))].map((_, i) => (
                         <motion.div
                           key={i}
                           className="absolute w-1 h-1 rounded-full"
                           style={{
                             left: `${Math.random() * 100}%`,
                             top: `${Math.random() * 100}%`,
-                            background: `linear-gradient(45deg, ${service.color.split(' ')[1]}, ${service.color.split(' ')[3]})`
+                            background: service.color
                           }}
                           variants={particleVariants}
                           animate="animate"
@@ -729,13 +630,12 @@ const Services = () => {
                   <div className="h-full flex flex-col relative z-10">
                     <motion.div
                       className="h-24 sm:h-32 md:h-40 lg:h-48 rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4 md:mb-6 relative"
-                      style={!prefersReducedMotion && window.innerWidth > 768 ? { y: useTransform(useMotionValue(scrollProgress), [0, 1], [0, -50]) } : {}}
                     >
                       <motion.img
                         src={service.image}
                         alt={service.title}
                         className="w-full h-full object-cover"
-                        whileHover={{ scale: prefersReducedMotion || window.innerWidth < 768 ? 1 : 1.1 }}
+                        whileHover={{ scale: prefersReducedMotion ? 1 : 1.1 }}
                         transition={{ duration: 0.4 }}
                         loading="lazy"
                       />
@@ -743,7 +643,7 @@ const Services = () => {
                         <motion.div
                           className="absolute inset-0"
                           style={{
-                            background: `linear-gradient(45deg, ${service.color})`
+                            background: service.color
                           }}
                           animate={{ opacity: [0.1, 0.3, 0.1] }}
                           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -755,8 +655,8 @@ const Services = () => {
                       <motion.div
                         className="relative"
                         whileHover={{ 
-                          rotate: prefersReducedMotion || window.innerWidth < 768 ? 0 : 360,
-                          scale: prefersReducedMotion || window.innerWidth < 768 ? 1 : 1.2
+                          rotate: prefersReducedMotion ? 0 : 360,
+                          scale: prefersReducedMotion ? 1 : 1.2
                         }}
                         transition={{ duration: 0.6 }}
                       >
@@ -767,9 +667,9 @@ const Services = () => {
                           }}
                           animate={!prefersReducedMotion && window.innerWidth > 768 ? {
                             boxShadow: [
-                              '0 0 20px rgba(102, 126, 234, 0.3)',
-                              '0 0 40px rgba(118, 75, 162, 0.4)',
-                              '0 0 20px rgba(139, 90, 150, 0.3)'
+                              `0 0 20px ${service.color}40`,
+                              `0 0 40px ${service.color}60`,
+                              `0 0 20px ${service.color}40`
                             ]
                           } : {}}
                           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -823,7 +723,7 @@ const Services = () => {
                           <motion.div
                             className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0"
                             style={{
-                              background: `linear-gradient(45deg, ${service.color})`
+                              background: service.color
                             }}
                             animate={!prefersReducedMotion && window.innerWidth > 768 ? {
                               scale: [1, 1.2, 1],
@@ -845,61 +745,121 @@ const Services = () => {
               ))}
             </div>
 
-            <div className="text-center mt-12 sm:mt-16 relative z-20">
-              <div className="flex justify-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
+            {/* Arrow Controls - Both Desktop AND Mobile */}
+            <div className="flex justify-between items-center mt-8 px-4 gap-4">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handlePrevCard}
+                className="p-2 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-20 relative flex-shrink-0"
+                aria-label="Previous service"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </motion.button>
+              
+              <div className="flex gap-1 sm:gap-2 mx-auto justify-center flex-wrap">
                 {services.map((_, index) => (
-                  <motion.div
+                  <motion.button
                     key={index}
-                    className="relative"
-                    whileHover={{ scale: prefersReducedMotion ? 1 : 1.2 }}
-                  >
-                    <motion.div
-                      className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full transition-all duration-500 ${
-                        index === currentCard ? 'w-6 sm:w-8' : ''
-                      }`}
-                      style={{
-                        background: index === currentCard 
-                          ? `linear-gradient(45deg, ${services[currentCard]?.color})` 
-                          : 'rgba(255,255,255,0.3)'
-                      }}
-                      animate={index === currentCard && !prefersReducedMotion ? {
-                        boxShadow: [
-                          '0 0 10px rgba(102, 126, 234, 0.5)',
-                          '0 0 20px rgba(118, 75, 162, 0.7)',
-                          '0 0 10px rgba(139, 90, 150, 0.5)'
-                        ]
-                      } : {}}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    />
-                  </motion.div>
+                    onClick={() => setCurrentCard(index)}
+                    className={`h-2 rounded-full transition-all ${
+                      index === currentCard ? 'w-6 sm:w-8' : 'w-2'
+                    }`}
+                    style={{
+                      background: index === currentCard 
+                        ? '#667EEA'
+                        : 'rgba(255, 255, 255, 0.3)'
+                    }}
+                    whileHover={{ scale: 1.2 }}
+                    aria-label={`Go to service ${index + 1}`}
+                  />
                 ))}
               </div>
-              
-              <motion.p 
-                className="text-white/70 mb-4 sm:mb-6 text-sm sm:text-base"
-                animate={!prefersReducedMotion ? { opacity: [0.7, 1, 0.7] } : {}}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleNextCard}
+                className="p-2 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-20 relative flex-shrink-0"
+                aria-label="Next service"
               >
-                Currently viewing: {' '}
-                <motion.span 
-                  className="font-semibold"
-                  style={{
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 25%, #e0e0e0 50%, #f8f8f8 75%, #ffffff 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text'
-                  }}
-                  animate={!prefersReducedMotion ? { scale: [1, 1.05, 1] } : {}}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  {services[currentCard]?.title}
-                </motion.span>
-              </motion.p>
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </motion.button>
             </div>
           </div>
+
+          {/* Current Card Details - Full Width */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="p-6 sm:p-8 md:p-12 rounded-2xl backdrop-blur-xl relative z-20"
+            style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: `2px solid #667EEA`
+            }}
+          >
+            <div className="grid md:grid-cols-2 gap-6 md:gap-12">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <motion.div
+                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-6"
+                  style={{
+                    background: `linear-gradient(135deg, #667EEA 0%, #667EEA 100%)`
+                  }}
+                  animate={!prefersReducedMotion ? {
+                    boxShadow: [
+                      '0 0 20px rgba(102, 126, 234, 0.4)',
+                      '0 0 40px rgba(102, 126, 234, 0.6)',
+                      '0 0 20px rgba(102, 126, 234, 0.4)'
+                    ]
+                  } : {}}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                </motion.div>
+
+                <h3 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+                  {services[currentCard]?.title}
+                </h3>
+
+                <p className="text-white/80 text-base sm:text-lg mb-6 sm:mb-8 leading-relaxed">
+                  {services[currentCard]?.description}
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <h4 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">Key Features</h4>
+                <div className="grid grid-cols-1 gap-3 sm:gap-4">
+                  {services[currentCard]?.features.map((feature, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="p-3 sm:p-4 rounded-lg bg-white/5 border border-white/10 flex items-center gap-2 sm:gap-3"
+                    >
+                      <div
+                        className="w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0"
+                        style={{ background: '#667EEA' }}
+                      />
+                      <span className="text-white/80 text-sm sm:text-base">{feature}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
+      {/* Stats Section */}
       <section className="py-16 md:py-20 bg-black relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
@@ -914,8 +874,8 @@ const Services = () => {
             animate={{
               background: [
                 'radial-gradient(circle at 0% 0%, rgba(102, 126, 234, 0.05) 0%, transparent 50%)',
-                'radial-gradient(circle at 100% 100%, rgba(118, 75, 162, 0.05) 0%, transparent 50%)',
-                'radial-gradient(circle at 0% 100%, rgba(139, 90, 150, 0.05) 0%, transparent 50%)',
+                'radial-gradient(circle at 100% 100%, rgba(102, 126, 234, 0.05) 0%, transparent 50%)',
+                'radial-gradient(circle at 0% 100%, rgba(102, 126, 234, 0.05) 0%, transparent 50%)',
                 'radial-gradient(circle at 100% 0%, rgba(102, 126, 234, 0.05) 0%, transparent 50%)'
               ]
             }}
@@ -957,12 +917,12 @@ const Services = () => {
                 <motion.div
                   className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-3"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2))'
+                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(102, 126, 234, 0.2))'
                   }}
                   animate={!prefersReducedMotion ? {
                     boxShadow: [
                       '0 0 20px rgba(102, 126, 234, 0.3)',
-                      '0 0 30px rgba(118, 75, 162, 0.4)',
+                      '0 0 30px rgba(102, 126, 234, 0.4)',
                       '0 0 20px rgba(102, 126, 234, 0.3)'
                     ]
                   } : {}}
@@ -984,6 +944,7 @@ const Services = () => {
         </div>
       </section>
 
+      {/* CTA Section */}
       <section className="py-16 sm:py-24 md:py-32 bg-black relative overflow-hidden">
         <div className="absolute inset-0 opacity-40 z-0 video-container">
           <video
@@ -1010,9 +971,9 @@ const Services = () => {
             animate={{
               background: [
                 'radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%)',
-                'radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%)',
-                'radial-gradient(circle at 50% 50%, rgba(139, 90, 150, 0.1) 0%, transparent 50%)',
-                'radial-gradient(circle at 20% 80%, rgba(155, 49, 146, 0.1) 0%, transparent 50%)',
+                'radial-gradient(circle at 80% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%)',
+                'radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%)',
+                'radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%)',
                 'radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%)'
               ]
             }}
@@ -1053,10 +1014,10 @@ const Services = () => {
                 className="absolute inset-0"
                 animate={{
                   background: [
-                    'linear-gradient(45deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 50%, rgba(139, 90, 150, 0.05) 100%)',
-                    'linear-gradient(135deg, rgba(118, 75, 162, 0.05) 0%, rgba(139, 90, 150, 0.05) 50%, rgba(155, 49, 146, 0.05) 100%)',
-                    'linear-gradient(225deg, rgba(139, 90, 150, 0.05) 0%, rgba(155, 49, 146, 0.05) 50%, rgba(102, 126, 234, 0.05) 100%)',
-                    'linear-gradient(315deg, rgba(155, 49, 146, 0.05) 0%, rgba(102, 126, 234, 0.05) 50%, rgba(118, 75, 162, 0.05) 100%)'
+                    'linear-gradient(45deg, rgba(102, 126, 234, 0.05) 0%, rgba(102, 126, 234, 0.05) 50%, rgba(102, 126, 234, 0.05) 100%)',
+                    'linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(102, 126, 234, 0.05) 50%, rgba(102, 126, 234, 0.05) 100%)',
+                    'linear-gradient(225deg, rgba(102, 126, 234, 0.05) 0%, rgba(102, 126, 234, 0.05) 50%, rgba(102, 126, 234, 0.05) 100%)',
+                    'linear-gradient(315deg, rgba(102, 126, 234, 0.05) 0%, rgba(102, 126, 234, 0.05) 50%, rgba(102, 126, 234, 0.05) 100%)'
                   ]
                 }}
                 transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}

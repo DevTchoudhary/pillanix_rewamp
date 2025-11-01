@@ -69,7 +69,6 @@ body {
   }
 }
 
-/* Hide horizontal scrollbars */
 ::-webkit-scrollbar:horizontal,
 html::-webkit-scrollbar:horizontal,
 body::-webkit-scrollbar:horizontal {
@@ -113,7 +112,6 @@ body::-webkit-scrollbar:horizontal {
   -webkit-backdrop-filter: blur(25px);
 }
 
-/* UPDATED: Responsive title and text sizing with clamp() for all devices */
 .hero-title {
   font-size: clamp(2.5rem, 5vw, 5rem) !important;
   line-height: 1.1 !important;
@@ -131,9 +129,13 @@ body::-webkit-scrollbar:horizontal {
   overflow-wrap: break-word !important;
 }
 
+/* 🔥 EXPERTISE NUMBER - NOW PURE WHITE */
 .expertise-number {
   font-size: clamp(3rem, 6vw, 7rem) !important;
   line-height: 1 !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em !important;
 }
 
 .expertise-title {
@@ -150,7 +152,6 @@ body::-webkit-scrollbar:horizontal {
   overflow-wrap: break-word !important;
 }
 
-/* Mobile-specific overrides (320px - 480px) */
 @media (max-width: 480px) {
   .hero-title {
     font-size: 2.5rem !important;
@@ -166,6 +167,7 @@ body::-webkit-scrollbar:horizontal {
   
   .expertise-number {
     font-size: 3rem !important;
+    color: #ffffff !important;
   }
   
   .expertise-title {
@@ -194,7 +196,6 @@ body::-webkit-scrollbar:horizontal {
   }
 }
 
-/* Tablet-specific (481px - 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
   .hero-title {
     font-size: 3rem !important;
@@ -207,6 +208,7 @@ body::-webkit-scrollbar:horizontal {
   
   .expertise-number {
     font-size: 4rem !important;
+    color: #ffffff !important;
   }
   
   .expertise-title {
@@ -218,7 +220,6 @@ body::-webkit-scrollbar:horizontal {
   }
 }
 
-/* Small laptop/tablet landscape (769px - 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
   .hero-title {
     font-size: 4rem !important;
@@ -226,6 +227,7 @@ body::-webkit-scrollbar:horizontal {
   
   .expertise-number {
     font-size: 6rem !important;
+    color: #ffffff !important;
   }
   
   .expertise-title {
@@ -233,7 +235,6 @@ body::-webkit-scrollbar:horizontal {
   }
 }
 
-/* ADDED: Medium laptops and smaller monitors (1025px - 1366px) */
 @media (min-width: 1025px) and (max-width: 1366px) {
   .hero-title {
     font-size: clamp(3.5rem, 4.5vw, 4.5rem) !important;
@@ -246,6 +247,7 @@ body::-webkit-scrollbar:horizontal {
   
   .expertise-number {
     font-size: clamp(5rem, 6vw, 6.5rem) !important;
+    color: #ffffff !important;
   }
   
   .expertise-title {
@@ -257,7 +259,6 @@ body::-webkit-scrollbar:horizontal {
   }
 }
 
-/* ADDED: Large laptops and standard monitors (1367px - 1920px) */
 @media (min-width: 1367px) and (max-width: 1920px) {
   .hero-title {
     font-size: clamp(4rem, 5vw, 5rem) !important;
@@ -270,6 +271,7 @@ body::-webkit-scrollbar:horizontal {
   
   .expertise-number {
     font-size: clamp(6rem, 6.5vw, 7rem) !important;
+    color: #ffffff !important;
   }
   
   .expertise-title {
@@ -281,7 +283,6 @@ body::-webkit-scrollbar:horizontal {
   }
 }
 
-/* ADDED: Ultra-wide and 4K monitors (1921px+) */
 @media (min-width: 1921px) {
   .hero-title {
     font-size: 5rem !important;
@@ -294,6 +295,7 @@ body::-webkit-scrollbar:horizontal {
   
   .expertise-number {
     font-size: 7rem !important;
+    color: #ffffff !important;
   }
   
   .expertise-title {
